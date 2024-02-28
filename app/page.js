@@ -1,12 +1,16 @@
+import React from "react";
 import TicketCard from "./(components)/TicketCard";
 
 // get tickets
 const getTickets = async () => {
   try {
     const res = await fetch("http://localhost:3000/api/Tickets", {
-      method: "GET",
       cache: "no-store",
     });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch tickets");
+    }
 
     return res.json();
   } catch (error) {
@@ -15,8 +19,14 @@ const getTickets = async () => {
 };
 
 const Dashboard = async () => {
-  const { tickets } = await getTickets();
+  const data = await getTickets();
 
+  // Make sure we have tickets needed for production build.
+  if (!data?.tickets) {
+    return <p>No tickets.</p>;
+  }
+
+  const tickets = data.tickets;
   // get categories
   const uniqueCategories = [
     // Set => take all the results and remove duplicate
